@@ -112,8 +112,8 @@
                         <c:redirect url="home.jsp" >
                             <jsp:setProperty name="user" property="validar" value="1" />
                             <c:forEach var="nomeCliente" items="${selectCliente.rows}">
-                                <jsp:setProperty name="user" property="id" value="${nomeCliente.id}" />
-                                <jsp:setProperty name="user" property="nome" value="${nomeCliente.nome}" />
+                                <jsp:setProperty name="user" property="id" value="${nomeCliente.id_pessoa}" />
+                                <jsp:setProperty name="user" property="nome" value="${nomeCliente.nome_pessoa}" />
                             </c:forEach>
                         </c:redirect>
                     </c:when>
@@ -280,12 +280,27 @@
 </c:if>
 
 <%-- Fechar pedido --%>
-<c:if test="${param.form = 'formFecharPedido'}" >
+<c:if test="${param.form == 'formFecharPedido'}" >
     <c:catch var="erroFecharPedido">
         <c:redirect url="pedido.jsp" >
-            <sql:update dataSource="${ds}" var="insertPedido" sql="insert into pedidos values (?,?,?)">
-                
+            <sql:update dataSource="${ds}" var="insertPedido" sql="insert into pedidos values (null,(select id_pessoa from pessoas where login_pessoa = ?),?)">
+                <sql:param value="${user.login}" />
+                <sql:param value="${user.login}${util.data}" />
+                <jsp:setProperty name="pedido" property="id" value="${user.login}${util.data}" />
             </sql:update>
         </c:redirect>
+    </c:catch>
+</c:if>
+<c:if test="${erroFecharPedido != null}">
+    <c:redirect url="produto.jsp">
+        <c:param name="msg" value="Erro ao fechar o pedido: ${erroFecharPedido}" />
+    </c:redirect>
+</c:if>
+
+
+<%-- listar pedidos clientes --%>
+<c:if test="${param.form == 'formListarPedidosCliente'}">
+    <c:catch var="erroListarPedido">
+        
     </c:catch>
 </c:if>
